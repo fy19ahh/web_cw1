@@ -4,6 +4,7 @@ import sys
 import json
 import os
 import random
+from prettytable import PrettyTable
 def LogIn(url, username, password):
     data = {
         'username': username,
@@ -20,7 +21,7 @@ def LogOut(token):
     headers = {
         'Authorization': f'Token {token}'
     }
-    r = requests.post("http://127.0.0.1:8000/api/logout", headers=headers)
+    r = requests.post("http://fy19ahh.pythonanywhere.com/api/logout", headers=headers)
     if r.status_code == 200:
         return r.json().get('token')
     else:
@@ -37,7 +38,7 @@ def Post(token, headline, category, region, details):
             'Content-Type': 'application/json',
             'Authorization': f'Token {token}'
         }
-        r = requests.post("http://127.0.0.1:8000/api/stories", data=json.dumps(data), headers=headers)
+        r = requests.post("http://fy19ahh.pythonanywhere.com/api/stories", data=json.dumps(data), headers=headers)
         if r.status_code != 200:
             return (r)
 
@@ -104,7 +105,7 @@ def Delete(token, key):
     headers = {
         'Authorization': f'Token {token}'
     }
-    url = f"http://127.0.0.1:8000/api/stories/{key}"
+    url = f"http://fy19ahh.pythonanywhere.com/api/stories/{key}"
     r = requests.delete(url, headers=headers)
     if r.status_code != 200:
         print ("Please check you are logged in and input a valid key")  
@@ -183,6 +184,7 @@ def main():
             # Single Agency
             if (agency_id) is not None:
                 if News(id=agency_id, category=category, region=region, date=date):
+                    print (f"Gathering stories from: {agency_id}")
                     for story in News(id=agency_id, category=category, region=region, date=date):
                         if isinstance(story, dict) and 'stories' in story:
                             try:
@@ -210,6 +212,9 @@ def main():
                         to_go_through.append(agency["agency_code"])
                 for agency_code in to_go_through:
                     if News(id=agency_code, category=category, region=region, date=date):
+                        print ("\n")
+                        print (f"Gathering stories from: {agency_code}")
+                        print ("\n")
                         for story in News(id=agency_code, category=category, region=region, date=date):
                             if isinstance(story, dict) and 'stories' in story:
                                 try:
@@ -226,7 +231,7 @@ def main():
                                 except KeyError:
                                     pass
                             else:
-                                pass
+                                print ("Failed to gather stories.")
                     
         elif command == "list":
             for agency in List():
