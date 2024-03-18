@@ -12,8 +12,9 @@ def LogIn(url, username, password):
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    r = requests.post(f"{url}/api/login", data=data, headers=headers)
+    r = requests.post("http://" + url + "/api/login", data=data, headers=headers)
     return r
+
 
 def LogOut(token):
     headers = {
