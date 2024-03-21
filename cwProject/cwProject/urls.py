@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from newsApp.views import Login, Logout, Story, DeleteStory, Greet
+from django.conf.urls.static import static
+from django.conf import settings
+
 
 urlpatterns = [
     path('', Greet),
@@ -25,4 +28,5 @@ urlpatterns = [
     path('api/logout', Logout, name='logout'),
     path('api/stories', Story, name='post-story'),
     path('api/stories/<int:key>', DeleteStory, name='delete-story'),
-]
+    
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

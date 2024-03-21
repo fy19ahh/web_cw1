@@ -13,7 +13,7 @@ def LogIn(url, username, password):
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    r = requests.post("http://" + url + "/api/login", data=data, headers=headers)
+    r = requests.post("https://" + url + "/api/login", data=data, headers=headers)
     return r
 
 
@@ -49,8 +49,8 @@ def List():
     random_agencies = random.sample(agencies, 20)
 
     return random_agencies
-    
-    
+
+
 def News(id, category, region, date):
     agency_url = None
     directory_url = "http://newssites.pythonanywhere.com/api/directory/"
@@ -76,14 +76,14 @@ def News(id, category, region, date):
         story_date = date
     else:
         story_date = '*'
-    
+
     if category is None:
         story_cat = '*'
     if region is None:
         story_region = '*'
     if date is None:
         story_date = '*'
-                
+
     params = {
     'story_cat': story_cat,
     'story_region' : story_region,
@@ -108,10 +108,10 @@ def Delete(token, key):
     url = f"http://fy19ahh.pythonanywhere.com/api/stories/{key}"
     r = requests.delete(url, headers=headers)
     if r.status_code != 200:
-        print ("Please check you are logged in and input a valid key")  
+        print ("Please check you are logged in and input a valid key")
     else:
         print (f"Story {key} Successfully Deleted")
-        
+
 def main():
     tokenValue = None
     key = 0
@@ -126,19 +126,19 @@ def main():
                 password = input("Password: ").strip()
                 try:
                     tokenValue = (LogIn(url, username, password)).json().get('token')
-                    print ("Successful Login.")
+                    print ("\nSuccessful Login.\n")
                 except:
-                    print ("Error: Invalid Credentials.")
+                    print ("\nError: Invalid Credentials.\n")
             else:
-                print("Invalid command format. Please enter login <url>.")
-        # Log Out     
+                print("\nInvalid command format. Please enter login <url>.\n")
+        # Log Out
         elif command == "logout":
             if tokenValue is not None:
                 LogOut(tokenValue)
-                print ("Logout successful.")
+                print ("\nLogout successful.\n")
                 tokenValue = None
             else:
-                print ("Error: No user logged in.")
+                print ("\nError: No user logged in.\n")
                 LogOut(None)
         # Post Story
         elif command == "post":
@@ -153,11 +153,11 @@ def main():
                     region=region,
                     details=details))
                 if newPost.status_code != 201:
-                    print ("Invalid Data Entered.")
+                    print ("\nFailed to post story.\n")
                 else:
-                    print ("Story Posted successfully.")
+                    print ("\nStory Posted successfully.\n")
             else:
-                print ("Please log in to post.")
+                print ("\nError: Please log in to post.\n")
                 Post(token=None,
                     headline="",
                     category="",
@@ -184,7 +184,9 @@ def main():
             # Single Agency
             if (agency_id) is not None:
                 if News(id=agency_id, category=category, region=region, date=date):
+                    print ("\n******************************")
                     print (f"Gathering stories from: {agency_id}")
+                    print ("******************************\n")
                     for story in News(id=agency_id, category=category, region=region, date=date):
                         if isinstance(story, dict) and 'stories' in story:
                             try:
@@ -203,8 +205,8 @@ def main():
                         else:
                             pass
                 else:
-                    print ("No Stories Found.")
-                    
+                    print ("\nNo Stories Found.\n")
+
             # All Agencies
             else:
                 to_go_through = []
@@ -212,9 +214,9 @@ def main():
                         to_go_through.append(agency["agency_code"])
                 for agency_code in to_go_through:
                     if News(id=agency_code, category=category, region=region, date=date):
-                        print ("\n")
+                        print ("\n******************************")
                         print (f"Gathering stories from: {agency_code}")
-                        print ("\n")
+                        print ("******************************\n")
                         for story in News(id=agency_code, category=category, region=region, date=date):
                             if isinstance(story, dict) and 'stories' in story:
                                 try:
@@ -232,15 +234,15 @@ def main():
                                     pass
                             else:
                                 print ("Failed to gather stories.")
-                    
+
         elif command == "list":
             for agency in List():
-                print ("----------------------------------------")
+                print ("\n----------------------------------------")
                 print ("Name: " + agency["agency_name"])
                 print ("Code: " + agency["agency_code"])
-                print ("URL: " + agency["url"])
+                print ("URL: " + agency["url"] + "\n")
             pass
-        
+
         # Delete story
         elif command.startswith("delete"):
             if tokenValue is not None:
@@ -249,15 +251,15 @@ def main():
                     key = arguments[1]
                     Delete(token=tokenValue, key=key)
                 else:
-                    print("Invalid command format. Please enter in the format 'delete <key>'.")
+                    print("\nInvalid command format. Please enter in the format 'delete <key>'.\n")
             else:
-                print("Please log in to delete a story.")
+                print("\nPlease log in to delete a story.\n")
         # Exit
         elif command == "exit":
-            print("Exiting the client.")
+            print("\nExiting the client.\n")
             break
         else:
-            print("Invalid command.")
-            
+            print("\nInvalid command.\n")
+
 if __name__ == "__main__":
     main()
